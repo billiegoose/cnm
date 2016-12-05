@@ -2,7 +2,8 @@
   "name": "cnm",
   "version": "0.0.0",
   "description": "Create Node Module is a cli for getting your new module off to a great start.",
-  "main": "cnm.js",
+  "bin": "cli.sh",
+  "preferGlobal": true,
   "scripts": {
     "docs": "projectz && mos"
   },

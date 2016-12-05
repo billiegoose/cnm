@@ -26,7 +26,7 @@ Download node at [nodejs.org](http://nodejs.org) and install it, if you haven't 
 Then in the terminal, run:
 
 ```sh
-npm install cnm --save
+npm install -g cnm
 ```
 
 ## Tests
