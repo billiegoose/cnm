@@ -19,6 +19,31 @@ Create Node Module is a cli for getting your new module off to a great start.
 <!-- /DESCRIPTION -->
 
 
+## TODOs
+
+- [x] Initial prototype
+- [ ] Port from shell to JavaScript
+- [ ] Cache global values (like author name, email) in config file
+- [ ] Add proper CLI parser
+- [ ] Make interactive with inquirer
+- [ ] Create a simpler parser than `projectz`/`mos` that just grabs from `## Identifier` to the next `## or ###` and updates it based on section templates.
+
+## Templates (Planned, not implemented)
+
+```
+templates
+├── badges.js
+├── dependencies.js
+├── footer.js
+├── header.js
+├── installation.js
+├── license.js
+└── tests.js
+```
+
+You could override the default template with a custom template in ~/.cnm or preferably save the override templates in the repo, either in a
+predictably named folder or a user-configurable location specified in package.json options.
+
 ## Installation
 
 Download node at [nodejs.org](http://nodejs.org) and install it, if you haven't already.
