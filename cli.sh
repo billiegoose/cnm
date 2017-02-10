@@ -8,9 +8,6 @@ if [ -z "$PROJECT" ]; then
   echo "depends on git, gh, npm, ava, readme, projectz"
   exit 0
 fi
-echo "Creating $PROJECT..."
-mkdir "$PROJECT"
-cd "$PROJECT"
 
 echo "Gathering requirements..."
 GITHUB_USER="$(gh me | head -n 2 | tail -n 1)"
@@ -20,7 +17,13 @@ AUTHOR_NAME=${AUTHOR_NAME:-"$(git config user.name)"}
 AUTHOR_EMAIL=${AUTHOR_EMAIL:-"$(npm config get init-author-email)"}
 AUTHOR_EMAIL=${AUTHOR_EMAIL:-"$(git config user.email)"}
 LICENSE="$(npm config get init-license)"
+if [ -f ~/.npmrc ] && grep -o 'registry.npmjs.org/:_authToken' ~/.npmrc &>/dev/null; then
+  NPM_PUBLISH_API_KEY="$(sed -e '/^registry.npmjs.org\/:_authToken=\(.*\)/! d' -e 's/^registry.npmjs.org\/:_authToken=\(.*\)/\1/' ~/.npmrc)"
+fi
 
+echo "Creating $PROJECT..."
+mkdir "$PROJECT"
+cd "$PROJECT"
 
 echo "Generating git repo..."
 gh create-repo "$PROJECT" -d "$DESCRIPTION"
@@ -53,7 +56,7 @@ test('foo', t => {
 echo "'use strict'
 " > "$PROJECT.js"
 
-echo 'Generating README.md and LICENSE.md'
+echo 'Generating README.md and LICENSE.md...'
 echo '
 <!-- TITLE -->
 <!-- BADGES -->
@@ -90,5 +93,22 @@ echo '<!-- LICENSEFILE/ -->
 <!-- /LICENSEFILE -->' > LICENSE.md
 projectz compile
 
+if which travis &>/dev/null && [ ! -z "$NPM_PUBLISH_API_KEY" ]; then
+  echo 'Generating .travis.yml...'
+  echo "language: node_js
+node_js:
+- node
+deploy:
+  provider: npm
+  email: $AUTHOR_EMAIL
+  on:
+    node: node
+    tags: true
+    branch: master
+    repo: $GITHUB_USER/$GITHUB_REPO" > .travis.yml
+  travis encrypt "$NPM_PUBLISH_API_KEY" --add deploy.api_key
+fi
+
 git add -A
 git commit -m 'Initial commit'
+
