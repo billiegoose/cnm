@@ -50,8 +50,8 @@ echo "import test from 'ava'
 test('foo', t => {
     t.is(2+2, 5)
 })" > "test/$PROJECT.test.js"
-echo '"use strict"
-' > "$PROJECT.js"
+echo "'use strict'
+" > "$PROJECT.js"
 
 echo 'Generating README.md and LICENSE.md'
 echo '
