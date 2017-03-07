@@ -106,6 +106,8 @@ deploy:
     tags: true
     branch: master
     repo: $GITHUB_USER/$GITHUB_REPO" > .travis.yml
+  travis sync
+  travis enable
   travis encrypt "$NPM_PUBLISH_API_KEY" --add deploy.api_key
 fi
 
