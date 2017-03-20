@@ -16,7 +16,13 @@
     "watch": "babel src --out-dir dist --watch",
     "build": "babel src --out-dir dist"
   },
-  "dependencies": {},
+  "dependencies": {
+    "application-config-path": "^0.1.0",
+    "command-line-args": "^4.0.2",
+    "command-line-usage": "^4.0.0",
+    "ghauth": "^3.2.1",
+    "shelljs": "^0.7.7"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-plugin-transform-async-to-generator": "^6.22.0",

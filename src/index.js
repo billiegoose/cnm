@@ -1,7 +1,8 @@
 import path from 'path'
 
 export default {
-  run () {
+  run (options) {
     console.log('hello world')
+    console.log(options)
   }
 }

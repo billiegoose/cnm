@@ -11,7 +11,8 @@ var _path2 = _interopRequireDefault(_path);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-  run() {
+  run(options) {
     console.log('hello world');
+    console.log(options);
   }
 };
