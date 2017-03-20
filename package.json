@@ -2,14 +2,34 @@
   "name": "cnm",
   "version": "0.0.0",
   "description": "Create Node Module is a cli for getting your new module off to a great start.",
-  "bin": "cli.sh",
-  "preferGlobal": true,
-  "scripts": {
-    "docs": "projectz && mos"
-  },
   "keywords": [],
   "author": "William Hilton <wmhilton@gmail.com>",
   "license": "Unlicense",
   "maintainers": [],
-  "contributors": []
+  "contributors": [],
+  "main": "dist/index.js",
+  "bin": {
+    "cnm": "dist/bin/cli.js"
+  },
+  "preferGlobal": true,
+  "scripts": {
+    "watch": "babel src --out-dir dist --watch",
+    "build": "babel src --out-dir dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-plugin-transform-async-to-generator": "^6.22.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "version": "^0.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmhilton/cnm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wmhilton/cnm/issues"
+  },
+  "homepage": "https://github.com/wmhilton/cnm#readme"
 }
