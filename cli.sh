@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 set -eu
-PROJECT="$1"
+DRYRUN='false'
+function dryrun () {
+  # Yeah I don't really know bash
+  if [[ "$DRYRUN" == 'true' ]]; then
+    return 0
+  fi
+  return 1
+}
+
+GITHUB_REPO="$1"
 FLAG="$2"
 DESCRIPTION="$3"
-if [ -z "$PROJECT" ]; then
+if [ -z "$GITHUB_REPO" ]; then
   echo 'Usage: newnpm <project-name> [--description \"<description>\"]'
   echo "depends on git, gh, npm, ava, readme, projectz"
   exit 0
@@ -11,24 +20,29 @@ fi
 
 echo "Gathering requirements..."
 GITHUB_USER="$(gh me | head -n 2 | tail -n 1)"
-GITHUB_REPO="$PROJECT"
+# normalize repository name
+if [[ "$GITHUB_REPO" != */* ]] ; then
+  GITHUB_REPO="$GITHUB_USER/$GITHUB_REPO"
+fi
+# remove repository user to isolate project name
+PROJECT=${GITHUB_REPO#*/}
 AUTHOR_NAME=${AUTHOR_NAME:-"$(npm config get init-author-name)"}
 AUTHOR_NAME=${AUTHOR_NAME:-"$(git config user.name)"}
 AUTHOR_EMAIL=${AUTHOR_EMAIL:-"$(npm config get init-author-email)"}
 AUTHOR_EMAIL=${AUTHOR_EMAIL:-"$(git config user.email)"}
 LICENSE="$(npm config get init-license)"
-if [ -f ~/.npmrc ] && grep -o 'registry.npmjs.org/:_authToken' ~/.npmrc &>/dev/null; then
-  NPM_PUBLISH_API_KEY="$(sed -e '/^registry.npmjs.org\/:_authToken=\(.*\)/! d' -e 's/^registry.npmjs.org\/:_authToken=\(.*\)/\1/' ~/.npmrc)"
+if [ -f ~/.npmrc ] && grep -o '//registry.npmjs.org/:_authToken' ~/.npmrc &>/dev/null; then
+  NPM_PUBLISH_API_KEY="$(sed -e '/^\/\/registry.npmjs.org\/:_authToken=\(.*\)/! d' -e 's/^\/\/registry.npmjs.org\/:_authToken=\(.*\)/\1/' ~/.npmrc)"
 fi
 
-echo "Creating $PROJECT..."
+echo "Creating $PROJECT directory..."
 mkdir "$PROJECT"
 cd "$PROJECT"
 
 echo "Generating git repo..."
-gh create-repo "$PROJECT" -d "$DESCRIPTION"
+dryrun || gh create-repo "$GITHUB_REPO" -d "$DESCRIPTION"
 git init
-git remote add origin "https://github.com/$GITHUB_USER/$GITHUB_REPO"
+git remote add origin "https://github.com/$GITHUB_REPO"
 echo "node_modules" > .gitignore
 
 echo "Generating package.json..."
@@ -44,6 +58,8 @@ echo '{
   "author": "'"$AUTHOR_NAME <$AUTHOR_EMAIL>"'",
   "license": "'"$LICENSE"'"
 }' > package.json
+# populate the readme, repository, etc fields.
+npm init -y
 
 echo 'Generating test directory...'
 #ava --init # Takes too long
@@ -96,8 +112,7 @@ projectz compile
 if which travis &>/dev/null && [ ! -z "$NPM_PUBLISH_API_KEY" ]; then
   echo 'Generating .travis.yml...'
   echo "language: node_js
-node_js:
-- node
+node_js: 6
 deploy:
   provider: npm
   email: $AUTHOR_EMAIL
@@ -105,12 +120,11 @@ deploy:
     node: node
     tags: true
     branch: master
-    repo: $GITHUB_USER/$GITHUB_REPO" > .travis.yml
-  travis sync
-  travis enable
-  travis encrypt "$NPM_PUBLISH_API_KEY" --add deploy.api_key
+    repo: $GITHUB_REPO" > .travis.yml
+  dryrun || travis sync
+  dryrun || travis enable
+  dryrun || travis encrypt "$NPM_PUBLISH_API_KEY" --add deploy.api_key
 fi
 
 git add -A
-git commit -m 'Initial commit'
 
